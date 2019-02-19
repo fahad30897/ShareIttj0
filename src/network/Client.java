@@ -1,6 +1,10 @@
 package network;
 
 import java.net.*;
+import java.util.*;
+
+import main.Session;
+
 import java.io.*;
 
 public class Client {
@@ -38,8 +42,8 @@ public class Client {
 	public Socket connect(InetAddress ip , int port) {
 		
 		try {
-			clientSocket = new Socket(ip , port);
-			return clientSocket;
+			
+			return  new Socket(ip , port);
 			
 		} catch (IOException e) {
 		
@@ -47,6 +51,8 @@ public class Client {
 			return null;
 		}	
 	}
+	
+	
 	
 	@Override
 	public String toString() {

@@ -1,5 +1,6 @@
 package main;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.net.*;
@@ -14,8 +15,10 @@ public class Session {
 	private static Server server;
 	private static int deviceType; // 0 for server , 1 for client
 	private static int PORT = 21132;
-	private static int BUFFER = 100;
+	private static int BACKLOG = 10;
+	private static int SENDBUFFER = 100;
 	private static GUILogic gui;
+	private static String pathToSave = "C:\\Users\\dell\\eclipse-workspace2\\ShareItGit\\ShareIt\\transferedfiles";
 	
 	public static GUILogic getGUI() {
 		return Session.gui;
@@ -61,8 +64,16 @@ public class Session {
 		return Session.PORT;
 	}
 	
-	public static void setPort(int p) {
-		Session.PORT = p;
+	public static int getSendBuffer() {
+		return Session.getSendBuffer();
+	}
+	
+	public static String getPath() {
+		return Session.pathToSave;
+	}
+	
+	public static void setPath(String p) {
+		Session.pathToSave = p;
 	}
 	
 	public static void showConnectedClient() {
@@ -70,7 +81,7 @@ public class Session {
 	}
 	
 	public static void createServer() throws UnknownHostException, IOException {
-		Server s = new Server(InetAddress.getLocalHost() ,Session.PORT, Session.BUFFER );
+		Server s = new Server(InetAddress.getLocalHost() ,Session.PORT, Session.BACKLOG );
 		Session.setDeviceType(0); // for server
 		s.createSocket();
 		//Socket clientSocket = s.connectToClient();
@@ -81,9 +92,26 @@ public class Session {
 	public static void connectToServer(InetAddress ip , int port) throws IOException {
 		Client client = new Client();
 		Socket soc = client.connect(ip, port);
-		server = new Server(ip,port,Session.BUFFER);
+		Session.server = new Server(ip,port,Session.BACKLOG);
 		deviceType = 1; // Client
-		server.setSocket(soc);
+		Session.server.setSocket(soc);
+		
+		
+	}
+	
+	
+	public static boolean askForPermission(File file, Client client) {
+		
+		boolean hasPermission = Session.gui.askForPermissoin(file , client.getSocket().getInetAddress() , client.getSocket().getPort());
+		return hasPermission;
+	}
+
+	public static void sendFile(String fileString,boolean toAll) throws ClassNotFoundException, IOException {
+		System.out.println("ShareIt: in Session sending file " + fileString);
+		File file = new File(fileString);
+		Communication com = new Communication();
+		System.out.println("ShareIt: Before callingg send file on communication" );
+		com.sendFileToServer(file);
 		
 	}
 	
@@ -97,6 +125,7 @@ public class Session {
 			e.printStackTrace();
 		}
 	}
+
 	
 	
 

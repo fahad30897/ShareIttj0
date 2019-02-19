@@ -6,6 +6,8 @@ import javax.swing.border.Border;
 import main.Session;
 
 import java.awt.*;
+import java.io.File;
+import java.net.InetAddress;
 
 public class GUILogic extends JFrame{
 	public JMenuBar menubar;
@@ -14,6 +16,7 @@ public class GUILogic extends JFrame{
 	public JPanel centerPanel = new JPanel(new GridLayout(0, 2));
 	public JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 	public JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+	public JPanel rightBottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 	public JPanel bottomPanel = new JPanel(new BorderLayout());
 	public JTextArea bottomTextArea;
 	public JButton selectFile,sendFile;
@@ -46,6 +49,9 @@ public class GUILogic extends JFrame{
 		this.setJMenuBar(menubar);
 		centerPanel.add(leftPanel, BorderLayout.CENTER);
 		centerPanel.add(rightPanel, BorderLayout.CENTER);
+		rightPanel.add(rightBottomPanel,BorderLayout.SOUTH);
+		rightPanel.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+		rightBottomPanel.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 		
 		
 		
@@ -60,9 +66,12 @@ public class GUILogic extends JFrame{
 		sendFile = new JButton("Send");
 		fileName = new JTextField(15);
 		fileName.setEditable(false);
-		rightPanel.add(selectFile);
-		rightPanel.add(fileName);
-		rightPanel.add(sendFile);
+		rightBottomPanel.add(selectFile);
+		rightBottomPanel.add(fileName);
+		rightBottomPanel.add(sendFile);
+		selectFile.setPreferredSize(new Dimension(100, 50));
+		sendFile.setPreferredSize(new Dimension(100, 50));
+		fileName.setPreferredSize(new Dimension(100, 50));
 		
 		
 		
@@ -90,7 +99,15 @@ public class GUILogic extends JFrame{
 		System.out.println("ss: setup listener" );
 		connectItem.addActionListener(new ActionEventHandler(GUILogic.this));
 		createItem.addActionListener(new ActionEventHandler(GUILogic.this));
+		selectFile.addActionListener(new ActionEventHandler(GUILogic.this));
+		sendFile.addActionListener(new ActionEventHandler(GUILogic.this));
 		this.addWindowListener(new WindowEventHandler(this));
+	}
+
+	public boolean askForPermissoin(File file, InetAddress inetAddress, int port) {
+		// TODO Show a dialog asking for permission
+		
+		return true;
 	}
 
 }

@@ -11,6 +11,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 
 import main.Session;
 
@@ -23,7 +24,7 @@ public class ActionEventHandler implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		System.out.println("ss: In action performed" );
+		//System.out.println("ss: In action performed" );
 		if(e.getSource() == gui.connectItem) {
 			JLabel IPAddressLabel,portNoLabel;
 			JDialog connectDialog = new JDialog(gui, "Connect", true);
@@ -84,7 +85,33 @@ public class ActionEventHandler implements ActionListener {
 				e1.printStackTrace();
 			}
 		}
+		else if(e.getSource() == gui.selectFile) {
+			JFileChooser fileOpen = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+			int r = fileOpen.showOpenDialog(null);
+			if (r == JFileChooser.APPROVE_OPTION) {
+				System.out.println("ShareIt : File selected" + fileOpen.getSelectedFile().getAbsolutePath());
+				 gui.fileName.setText(fileOpen.getSelectedFile().getAbsolutePath());
+			}
+//				gui.fileName.setText(fileOpen.getSelectedFile().getName());
+	        else {
+	        	JOptionPane.showMessageDialog(this.gui, "User didn't select any file");
+	        	gui.fileName.setText("");
+	        }
+		}
+		else if(e.getSource() == gui.sendFile) {
+			try {
+				System.out.println("ShareIt : client sending in actino Event handler" );
+				Session.sendFile(gui.fileName.getText(), false);
+			} catch (ClassNotFoundException | IOException e1) {
+				
+				e1.printStackTrace();
+			}
+		}
+		
 	}
+	
+	
+	
 	public static void addComp(JPanel thePanel, Component comp, int xPos, int yPos, int compWidth, int compHeight, int place,
 			int stretch) {
 

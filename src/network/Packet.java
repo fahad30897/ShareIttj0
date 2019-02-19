@@ -2,21 +2,17 @@ package network;
 
 import java.io.*;
 
-public class Packet implements Serializable{
+public abstract class Packet implements Serializable{
 	
 
 	private static final long serialVersionUID = 1L;
 	private PacketType packetType;
-	private String message;
 	
-	public Packet(PacketType packetType , String message) {
-		this.setPacketType(packetType);
-		this.setMessage(message);
-	}
 	
 	public Packet(PacketType packetType) {
-		this(packetType , "");
+		this.setPacketType(packetType);	
 	}
+	
 	
 	
 	public PacketType getPacketType() {
@@ -27,21 +23,14 @@ public class Packet implements Serializable{
 		this.packetType = p;
 	}
 	
-	public String getMessage() {
-		return this.message;
-	}
 	
-	public void setMessage(String msg) {
-		this.message = msg;
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if(o instanceof Packet) {
-			Packet p = (Packet) o;
-			return (p.getPacketType() == this.packetType && p.getMessage().equals(this.message)) ? true: false;
-		}
-		return false;
-	}
+//	@Override
+//	public boolean equals(Object o) {
+//		if(o instanceof Packet) {
+//			Packet p = (Packet) o;
+//			return (p.getPacketType() == this.packetType ) ? true: false;
+//		}
+//		return false;
+//	}
 
 }

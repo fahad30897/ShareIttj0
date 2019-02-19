@@ -18,6 +18,7 @@ public class ServerAcceptThread implements Runnable{
 		this.server = server;
 		t = new Thread(this ,name);
 		System.out.println("ss: before start" );
+		t.setDaemon(true);
 		t.start();
 	}
 	
@@ -40,7 +41,10 @@ public class ServerAcceptThread implements Runnable{
 				
 				Session.setClient(client);
 				
+				//TODO: Move this into setClient
 				Session.showConnectedClient();
+				
+				
 				
 				System.out.println("client connected: " + socket.getInetAddress().getHostName());
 				

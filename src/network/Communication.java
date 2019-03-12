@@ -1,6 +1,8 @@
 package network;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import main.Session;
@@ -8,48 +10,92 @@ import main.Session;
 public class Communication {
 
 	
-public void sendFileToServer(File file) throws IOException, ClassNotFoundException {
-	System.out.println("ShareIt: in Communication sendFile to Server" + file.getAbsolutePath());
+	public void sendFileToServer(File file) throws IOException, ClassNotFoundException {
+		System.out.println("ShareIt: in Communication sendFile to Server" + file.getAbsolutePath());
 		if(file.exists()) {
 			ObjectOutputStream oos = null;
 			ObjectInputStream ois = null;
 			try {
-				System.out.println("ShareIt: in Communication in try" + Session.getServer().getSocket());
+				System.out.println("ShareIt: in Communication in try " + Session.getServer().getSocket());
 				oos = new ObjectOutputStream(Session.getServer().getSocket().getOutputStream());
-				System.out.println("ShareIt: in communication between object stream"+ Session.getServer().getSocket().getInputStream() );
-				ois = new ObjectInputStream(Session.getServer().getSocket().getInputStream());
+				
+				
 				System.out.println("ShareIt: in Communication object stream created" + file.getAbsolutePath());
-				FilePacket filePacket = new FilePacket(PacketType.FileSendPermitPacket , file);
+				
+				byte[] fileArr = Files.readAllBytes(file.toPath());
+				FilePacket filePacket = new FilePacket(PacketType.FileSendPermitPacket , file , fileArr);
 				System.out.println("ShareIt : client sending file" + file.getAbsolutePath());
 				oos.writeObject(filePacket);
 				System.out.println("ShareIt : client waiting for permission" );
+				InputStream is = Session.getServer().getSocket().getInputStream();
+				
+				ois = new ObjectInputStream(is);
+				
 				Object object = ois.readObject();
-				System.out.println("ShareIt : client read object" + object );
+				
 				if(object instanceof Packet) {
 					Packet p = (Packet) object;
 					
 					if(p.getPacketType() == PacketType.FileSendAcceptPacket) {
-						//Code to send File
+						//File sent show user that file is accepted
 						
-						FileInputStream fis = new FileInputStream(file);
-				        byte [] buffer = new byte[Session.getSendBuffer()];
-				        Integer bytesRead = 0;
-				        
-				        while ((bytesRead = fis.read(buffer)) > 0) {
-				            oos.writeObject(bytesRead);
-				            oos.writeObject(Arrays.copyOf(buffer, buffer.length));
-				        }
-				 
+				        System.out.println("ShareIt : Client File sent");
 						
 					}
 					else if(p.getPacketType() == PacketType.FileSendRejectPacket) {
-						// Show message to user
+						// Show message to user that file was rejected
 					}
 				}
 			}
 			finally {
-				if(oos != null) oos.close();
-	        	if(ois != null) ois.close();
+				//if(oos != null) oos.close();
+	        	//if(ois != null) ois.close();
+	        }
+			
+		}
+		
+	}
+	
+	public void sendFileToClient(File file) throws IOException, ClassNotFoundException {
+		System.out.println("ShareIt: in Communication sendFile to Server" + file.getAbsolutePath());
+		if(file.exists()) {
+			ObjectOutputStream oos = null;
+			ObjectInputStream ois = null;
+			try {
+				System.out.println("ShareIt: in Communication in try " + Session.getServer().getSocket());
+				oos = new ObjectOutputStream(Session.getClient().getSocket().getOutputStream());
+				InputStream is = Session.getClient().getSocket().getInputStream();
+				
+				System.out.println("ShareIt: in Communication object stream created" + file.getAbsolutePath());
+				
+				byte[] fileArr = Files.readAllBytes(file.toPath());
+				FilePacket filePacket = new FilePacket(PacketType.FileSendPermitPacket , file , fileArr);
+				System.out.println("ShareIt : client sending file" + file.getAbsolutePath());
+				oos.writeObject(filePacket);
+				System.out.println("ShareIt : client waiting for permission" );
+				
+				
+				ois = new ObjectInputStream(is);
+				
+				Object object = ois.readObject();
+				
+				if(object instanceof Packet) {
+					Packet p = (Packet) object;
+					
+					if(p.getPacketType() == PacketType.FileSendAcceptPacket) {
+						//File sent show user that file is accepted
+						
+				        System.out.println("ShareIt : Client File sent");
+						
+					}
+					else if(p.getPacketType() == PacketType.FileSendRejectPacket) {
+						// Show message to user that file was rejected
+					}
+				}
+			}
+			finally {
+				//if(oos != null) oos.close();
+	        	//if(ois != null) ois.close();
 	        }
 			
 		}

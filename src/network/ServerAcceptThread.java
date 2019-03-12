@@ -44,7 +44,7 @@ public class ServerAcceptThread implements Runnable{
 				//TODO: Move this into setClient
 				Session.showConnectedClient();
 				
-				
+				ClientListenerThread cli = new ClientListenerThread("Client Listener " + socket.getInetAddress().getHostName() , client);
 				
 				System.out.println("client connected: " + socket.getInetAddress().getHostName());
 				

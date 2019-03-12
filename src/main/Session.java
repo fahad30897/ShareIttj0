@@ -19,6 +19,7 @@ public class Session {
 	private static int SENDBUFFER = 100;
 	private static GUILogic gui;
 	private static String pathToSave = "C:\\Users\\dell\\eclipse-workspace2\\ShareItGit\\ShareIt\\transferedfiles";
+	private static String sendFilePath = "";
 	
 	public static GUILogic getGUI() {
 		return Session.gui;
@@ -34,6 +35,14 @@ public class Session {
 	
 	public static void setClient(Client client) {
 		Session.client = client;
+	}
+	
+	public static String getSendFilePath() {
+		return Session.sendFilePath;
+	}
+	
+	public static void setSendFilePath(String f) {
+		Session.sendFilePath = f;
 	}
 	
 	public static Server getServer() {
@@ -100,10 +109,22 @@ public class Session {
 	}
 	
 	
-	public static boolean askForPermission(File file, Client client) {
+	public static boolean askForPermission(File file, Object object) {
 		
-		boolean hasPermission = Session.gui.askForPermissoin(file , client.getSocket().getInetAddress() , client.getSocket().getPort());
-		return hasPermission;
+		if(object instanceof Client) {
+			Client client = (Client) object;
+			System.out.println("ShareIt : CLient ask for permission Session");
+			boolean hasPermission = Session.gui.askForPermissoin(file , client.getSocket().getInetAddress() , client.getSocket().getPort());
+			return hasPermission;	
+		}
+		else {
+			Server server = (Server) object;
+			System.out.println("ShareIt : Server ask for permission Session");
+			boolean hasPermission = Session.gui.askForPermissoin(file , server.getSocket().getInetAddress() , server.getSocket().getPort());
+			return hasPermission;
+		}
+		
+		
 	}
 
 	public static void sendFile(String fileString,boolean toAll) throws ClassNotFoundException, IOException {
@@ -111,7 +132,12 @@ public class Session {
 		File file = new File(fileString);
 		Communication com = new Communication();
 		System.out.println("ShareIt: Before callingg send file on communication" );
-		com.sendFileToServer(file);
+		if(Session.getDeviceType() == 1) {
+			com.sendFileToServer(file);
+		}
+		else {
+			com.sendFileToClient(file);
+		}
 		
 	}
 	

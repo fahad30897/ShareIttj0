@@ -42,8 +42,19 @@ public class Client {
 	public Socket connect(InetAddress ip , int port) {
 		
 		try {
+			Socket s = new Socket(ip , port);
 			
-			return  new Socket(ip , port);
+			Server server = new Server(ip,port,10);
+			server.setSocket(s);
+			
+			//todo tell client that it is connected
+			
+			//ServerListenerThread slt= new ServerListenerThread("server listener", server);
+			
+			System.out.println("ShareIt: server listener created");
+					
+					
+			return  s;
 			
 		} catch (IOException e) {
 		

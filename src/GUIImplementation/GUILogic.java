@@ -106,8 +106,10 @@ public class GUILogic extends JFrame{
 
 	public boolean askForPermissoin(File file, InetAddress inetAddress, int port) {
 		// TODO Show a dialog asking for permission
+		System.out.println("ShareIt : Server In asForPermission GUI");
+		int permit = JOptionPane.showConfirmDialog(this, "Accept File " + file.getName());
 		
-		return true;
+		return (permit == JOptionPane.OK_OPTION) ? true : false;
 	}
 
 }

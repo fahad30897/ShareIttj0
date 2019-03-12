@@ -90,7 +90,8 @@ public class ActionEventHandler implements ActionListener {
 			int r = fileOpen.showOpenDialog(null);
 			if (r == JFileChooser.APPROVE_OPTION) {
 				System.out.println("ShareIt : File selected" + fileOpen.getSelectedFile().getAbsolutePath());
-				 gui.fileName.setText(fileOpen.getSelectedFile().getAbsolutePath());
+				 gui.fileName.setText(fileOpen.getSelectedFile().getName());
+				 Session.setSendFilePath(fileOpen.getSelectedFile().getAbsolutePath());
 			}
 //				gui.fileName.setText(fileOpen.getSelectedFile().getName());
 	        else {
@@ -101,7 +102,7 @@ public class ActionEventHandler implements ActionListener {
 		else if(e.getSource() == gui.sendFile) {
 			try {
 				System.out.println("ShareIt : client sending in actino Event handler" );
-				Session.sendFile(gui.fileName.getText(), false);
+				Session.sendFile(Session.getSendFilePath(), false);
 			} catch (ClassNotFoundException | IOException e1) {
 				
 				e1.printStackTrace();

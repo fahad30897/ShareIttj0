@@ -1,11 +1,7 @@
 package network;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
+import java.io.*;
+import java.net.*;
 import main.Session;
 
 public class ServerListenerThread implements Runnable {
@@ -16,11 +12,12 @@ public class ServerListenerThread implements Runnable {
 	private Server server;
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
+	private InetAddress ip;
 	
-	public ServerListenerThread(String n, Server server) {
+	public ServerListenerThread(String n, Server server, InetAddress ip) {
 		this.name = n;
 		this.server = server;
-		
+		this.ip = ip;
 		t = new Thread(this ,name);
 		System.out.println("ss: before server listener start" );
 		t.setDaemon(true);
@@ -31,18 +28,30 @@ public class ServerListenerThread implements Runnable {
 	
 	@Override
 	public void run() {
+		ServerSocket ss = null;
+		Socket socket = null;
 		try {
 			
 			
+			
+			
+			
+			System.out.println("ShareIt: in serverlistenerThread before while");
 			while(true) {
 				if(end) {
 					break;
 				}
-				if(this.server.getSocket().isClosed()) {
-					break;
-				}
-				this.ois = new ObjectInputStream(this.server.getSocket().getInputStream());
-				this.oos = new ObjectOutputStream(this.server.getSocket().getOutputStream());
+//				if(this.server.getSocket().isClosed()) {
+//					break;
+//				}
+				
+				ss = new ServerSocket(Session.getClientPort() ,10 , this.ip);
+				System.out.println("ShareIt: in serverlistenerThread before accept");
+				socket = ss.accept();
+				this.ois = new ObjectInputStream(socket.getInputStream());
+				this.oos = new ObjectOutputStream(socket.getOutputStream());
+				
+				System.out.println("ShareIt: in serverlistenerThread before Streams");
 				
 				System.out.println("Shareit : Waiting for server to write");
 				Object object = ois.readObject(); // wait for server to send;
@@ -90,11 +99,38 @@ public class ServerListenerThread implements Runnable {
 							}
 							
 						break;
+						case GetFilePacket:
+							System.out.println("server Listner: get file packet");
+							FilePacket fp1 = (FilePacket) p;
+								
+							FilePacket filePacket = new FilePacket(PacketType.FileSendAcceptPacket , fp1.getFile());
+							
+							oos.writeObject(filePacket);
+							System.out.println("ShareIt : client Recieving file" );
+
+							//Code to read File
+							
+							FileOutputStream fos = new FileOutputStream(new File(Session.getPath() + "\\" + fp1.getFile().getName() ));
+						
+							
+							
+							byte[] fileArr = fp1.getFileArr();
+							fos.write(fileArr, 0, fileArr.length);
+					        System.out.println("ShareIt : server succecsffully transfer file");
+					         
+					        fos.close();
+					 
+//						        ois.close();
+//						        oos.close();
+//								
+							
+						
+						break;
 					}
 					
 				}
-			
-			
+				socket.close();
+				ss.close();
 			}
 		} catch (IOException e) {
 			
@@ -106,6 +142,18 @@ public class ServerListenerThread implements Runnable {
 			
 			e.printStackTrace();
 		} 
+		finally {
+			try {
+				if(ss!= null && !ss.isClosed())
+				ss.close();
+				if(socket != null && !socket.isClosed())
+				socket.close();
+			}
+			catch(Exception e) {
+				System.out.println("unexpected error");
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public synchronized void stop() {

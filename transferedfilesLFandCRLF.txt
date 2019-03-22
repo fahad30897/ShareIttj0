@@ -1,0 +1,54 @@
+. CR is a bytecode for carriage return (from the days of typewriters) and LF similarly, for line feed. It just refers to the bytes that are placed as end-of-line markers.
+
+They are used to mark a line break in a text file. Windows uses two characters the CR LF sequence; Unix only uses LF and the old MacOS ( pre-OSX MacIntosh) used CR.
+
+MS-DOS/Windows: CR/LF
+Unix: LF
+Macintosh: CR
+VAX VMS: LF/CR
+
+
+CR = Carriage Return and LF = Line Feed, two expressions have their roots in the old typewriters / TTY. LF moved the paper up (but kept the horizontal position identical) and CR brought back the "carriage" so that the next character typed would be at the leftmost position on the paper (but on the same line). CR+LF was doing both, i.e. preparing to type a new line. As time went by the physical semantics of the codes were not applicable, and as memory and floppy disk space were at a premium, some OS designers decided to only use one of the characters, they just didn't communicate very well with one another 
+
+
+The Carriage Return (CR) character (0x0D, \r) moves the cursor to the beginning of the line without advancing to the next line. This character is used as a new line character in Commodore and Early Macintosh operating systems (OS-9 and earlier).
+
+The Line Feed (LF) character (0x0A, \n) moves the cursor down to the next line without returning to the beginning of the line. This character is used as a new line character in UNIX based systems (Linux, Mac OSX, etc)
+
+The End of Line (EOL) sequence (0x0D 0x0A, \r\n) is actually two ASCII characters, a combination of the CR and LF characters. It moves the cursor both down to the next line and to the beginning of that line. This character is used as a new line character in most other non-Unix operating systems including Microsoft Windows, Symbian OS and others.
+
+
+Carriage Return (MAC pre-OSX)
+
+CR
+\r
+ASCII code 13
+Line Feed (Linux, MAC OSX)
+
+LF
+\n
+ASCII code 10
+Carriage Return and Line Feed (Windows)
+
+CRLF
+\r\n
+ASCII code 13 and then ASCII code 10	
+
+Windows derives from DOS, where they followed the traditional/official standard: ASCII. In ASCII you need CR + LF or LF + CR to go to next line. Originally ASCII had two character, because the operation was physically slow, so it get time to teleprinter to jump in the right position.
+
+he sequence CR+LF was in common use on many early computer systems that had adopted teletype machines as a console device, because this sequence was required to position those printers at the start of a new line. On these systems, text was often routinely composed to be compatible with these printers, since the concept of device drivers hiding such hardware details from the application was not yet well developed; applications had to talk directly to the teletype machine and follow its conventions. The separation of the two functions concealed the fact that the print head could not return from the far right to the beginning of the next line in one-character time. That is why the sequence was always sent with the CR first. In fact, it was often necessary to send extra characters (extraneous CRs or NULs, which are ignored) to give the print head time to move to the left margin.
+
+
+ when you get code from git that was uploaded from a unix system they will only have an LF.
+If you want to turn this warning off, type this in the git command line
+//git config core.autocrlf true
+$ git config --global core.autocrlf true
+
+
+If you’re on a Linux or Mac system that uses LF line endings, then you don’t want Git to automatically convert them when you check out files; however, if a file with CRLF endings accidentally gets introduced, then you may want Git to
+ fix it. You can tell Git to convert CRLF to LF on commit but not the other way around by setting core.autocrlf to input:
+$ git config --global core.autocrlf input
+This setup should leave you with CRLF endings in Windows checkouts, but LF endings on Mac and Linux systems and in the repository
+
+If you’re a Windows programmer doing a Windows-only project, then you can turn off this functionality, recording the carriage returns in the repository by setting the config value to false:
+$ git config --global core.autocrlf false

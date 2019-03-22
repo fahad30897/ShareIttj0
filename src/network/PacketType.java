@@ -6,5 +6,8 @@ public enum PacketType {
 	FileSendRejectPacket,
 	FilePacket,
 	FindNearbyDevicePacket,
+	GetFilePacket,
+	RequestDirectoryPacket,
+	RecievedDirectoryPacket,
 	;
 }

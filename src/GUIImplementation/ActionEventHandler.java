@@ -6,7 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -14,6 +14,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 
 import main.Session;
+import network.Communication;
 
 public class ActionEventHandler implements ActionListener {
 	private GUILogic gui;
@@ -71,6 +72,7 @@ public class ActionEventHandler implements ActionListener {
 			connectDialog.setVisible(true);
 		}
 		else if(e.getSource() == gui.createItem) {
+			//System.out.println("create Item" );
 			try {
 				System.out.println("ss: create action" );
 				Session.createServer();
@@ -84,6 +86,27 @@ public class ActionEventHandler implements ActionListener {
 				JOptionPane.showMessageDialog(gui, "Error" ,"Error" , JOptionPane.ERROR_MESSAGE );
 				e1.printStackTrace();
 			}
+		}
+		else if(e.getSource() == gui.filePathItem) {
+			String tempFilePath;
+			System.out.println("in handler");
+			JFileChooser chooser = new JFileChooser();
+		    chooser.setCurrentDirectory(new java.io.File("."));
+		    chooser.setDialogTitle("Select Folder");
+		    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		    chooser.setAcceptAllFileFilterUsed(false);
+		    
+		    if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+		      System.out.println("getSelectedFile() : " + chooser.getSelectedFile());
+		      tempFilePath=chooser.getSelectedFile().toString();
+		      tempFilePath = tempFilePath + "\\ShareItTransferedFiles";
+		      new File(tempFilePath).mkdirs();
+		      Session.setPath(tempFilePath);
+		      
+		    } else {
+		      System.out.println("No Selection ");
+		    }
+		  
 		}
 		else if(e.getSource() == gui.selectFile) {
 			JFileChooser fileOpen = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
@@ -105,6 +128,25 @@ public class ActionEventHandler implements ActionListener {
 				Session.sendFile(Session.getSendFilePath(), false);
 			} catch (ClassNotFoundException | IOException e1) {
 				
+				e1.printStackTrace();
+			}
+		}
+		else if(e.getSource() == gui.getDirectory) {
+			try {
+				Communication com = new Communication();
+				if(gui.fileListModel.getSize() == 0) {
+					System.out.println("ShareIt: in getDirectory = 0");
+					com.getFiles("C:\\");
+					
+				}
+				else {
+					System.out.println("ShareIt: in getDirectory != 0");
+					int index = gui.fileList.getSelectedIndex();
+					File file = Session.getFiles().get(index);
+					com.getFiles(file.getAbsolutePath());
+				}
+				
+			} catch (ClassNotFoundException | IOException e1) {
 				e1.printStackTrace();
 			}
 		}

@@ -47,12 +47,17 @@ public class Client {
 			Server server = new Server(ip,port,10);
 			server.setSocket(s);
 			
-			//todo tell client that it is connected
+			this.setIP(s.getLocalAddress());
+			this.setPort(s.getLocalPort());
+			Session.setClient(this);
 			
-			//ServerListenerThread slt= new ServerListenerThread("server listener", server);
+			//TODO tell client that it is connected
+			System.out.println("ShareIt : In Client connect: " + s.getLocalAddress());
+			ServerListenerThread slt= new ServerListenerThread("server listener", server, s.getLocalAddress());
 			
 			System.out.println("ShareIt: server listener created");
 					
+			
 					
 			return  s;
 			

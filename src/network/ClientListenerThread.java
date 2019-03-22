@@ -1,6 +1,8 @@
 package network;
 
 import java.net.*;
+import java.util.*;
+
 
 import exceptions.ShareItException;
 import main.Session;
@@ -87,6 +89,40 @@ public class ClientListenerThread implements Runnable{
 								
 								oos.writeObject(filePacket);
 								
+							}
+							
+						break;
+						case RequestDirectoryPacket:
+							MessagePacket msg = (MessagePacket) p;
+							String directory = msg.getMessage();
+							System.out.println("ShareIt: Server RequestDirectoryPacket " + directory);
+							File folder = new File(directory);
+							System.out.println("Hello World");
+							
+							if(folder.isDirectory()) {
+								File[] files = folder.listFiles();
+								List<File> fileList = new ArrayList<File>(Arrays.asList(files));
+								
+								DirectoryPacket dir = new DirectoryPacket(PacketType.RecievedDirectoryPacket , directory , fileList);
+								
+								oos.writeObject(dir);
+							}
+							else {
+								Communication com = new Communication();
+								
+								com.sendFileToClient(folder, false);
+								System.out.println("ShareIt: Server RequestDirectoryPacket else condition "+directory);
+								int index=directory.lastIndexOf('\\');
+								System.out.println(index);
+								directory = directory.substring(0,index);
+							    System.out.println("ShareIt: Server RequestDirectoryPacket else condition "+directory);
+							    File lastFolder = new File(directory);
+							    File[] files = lastFolder.listFiles();
+								List<File> fileList = new ArrayList<File>(Arrays.asList(files));
+								
+								DirectoryPacket dir = new DirectoryPacket(PacketType.RecievedDirectoryPacket , directory , fileList);
+								
+								oos.writeObject(dir);
 							}
 							
 						break;

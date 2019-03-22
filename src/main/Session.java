@@ -1,5 +1,6 @@
 package main;
 
+import java.util.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -20,6 +21,9 @@ public class Session {
 	private static GUILogic gui;
 	private static String pathToSave = "C:\\Users\\dell\\eclipse-workspace2\\ShareItGit\\ShareIt\\transferedfiles";
 	private static String sendFilePath = "";
+	private static int CLIENTPORT = 22222;
+	private static List<History> history = new ArrayList<History>();
+	private static List<File> files = new ArrayList<File>();
 	
 	public static GUILogic getGUI() {
 		return Session.gui;
@@ -27,6 +31,29 @@ public class Session {
 	
 	public static void setGUI(GUILogic g) {
 		Session.gui = g;
+	}
+	
+	public static void setFiles(List<File> files) {
+		Session.files = files;
+		Session.gui.setFiles();
+	}
+	
+	public static List<File> getFiles() {
+		return Session.files;
+	}
+	
+	public static List<History> getHistory(){
+		return Session.history;
+	}
+	
+	public static void setHistory(List<History> files) {
+		Session.history = files;
+	}
+	
+	public static void addHistory(History history) {
+		System.out.println("In add history");
+		Session.history.add(history);
+		Session.gui.refreshTable();
 	}
 	
 	public static Client getClient() {
@@ -73,6 +100,10 @@ public class Session {
 		return Session.PORT;
 	}
 	
+	public static int getClientPort() {
+		return Session.CLIENTPORT;
+	}
+	
 	public static int getSendBuffer() {
 		return Session.getSendBuffer();
 	}
@@ -115,12 +146,24 @@ public class Session {
 			Client client = (Client) object;
 			System.out.println("ShareIt : CLient ask for permission Session");
 			boolean hasPermission = Session.gui.askForPermissoin(file , client.getSocket().getInetAddress() , client.getSocket().getPort());
+			
+			if(hasPermission) {
+				System.out.println("ShareIt: in askpermission client ");
+				History history = new History(file , Session.getClient().getIP() , Session.getServer().getIP());
+				Session.addHistory(history);
+			}
 			return hasPermission;	
 		}
 		else {
 			Server server = (Server) object;
 			System.out.println("ShareIt : Server ask for permission Session");
 			boolean hasPermission = Session.gui.askForPermissoin(file , server.getSocket().getInetAddress() , server.getSocket().getPort());
+			
+			if(hasPermission) {
+				History history = new History(file , Session.getServer().getIP() , Session.getClient().getIP());
+				Session.addHistory(history);
+			}
+			
 			return hasPermission;
 		}
 		
@@ -133,10 +176,18 @@ public class Session {
 		Communication com = new Communication();
 		System.out.println("ShareIt: Before callingg send file on communication" );
 		if(Session.getDeviceType() == 1) {
+			System.out.println("ShareIt: In session sendign to server");
+			History history = new History(file , Session.getClient().getIP() , Session.getServer().getIP());
+			Session.addHistory(history);
 			com.sendFileToServer(file);
+			
 		}
 		else {
-			com.sendFileToClient(file);
+			System.out.println("ShareIt: In session sendign to clients");
+			
+			History history = new History(file , Session.getServer().getIP() , Session.getClient().getIP());
+			Session.addHistory(history);
+			com.sendFileToClient(file, true);
 		}
 		
 	}
@@ -146,6 +197,14 @@ public class Session {
 			InetAddress ip = InetAddress.getLocalHost();
 			System.out.println("Host name:" + ip.getHostName());
 			System.out.println("Host address:" + ip.getHostAddress());
+			File folder = new File("\\");
+			System.out.println("Hello World");
+			File[] files = folder.listFiles();
+			for(File file: files) {
+				System.out.println(file);
+			}
+			
+			
 		} 
 		catch (UnknownHostException e) {
 			e.printStackTrace();
